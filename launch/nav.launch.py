@@ -505,7 +505,7 @@ def generate_launch_description():
         delayed_ekf,
         delayed_scan_filter,
         delayed_nav2,
-        # delayed_global_localizer,
+        delayed_global_localizer,
         delayed_initial_pose,
         delayed_checkpoint_nav,
     ])
