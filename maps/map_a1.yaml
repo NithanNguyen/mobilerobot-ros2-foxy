@@ -1,7 +1,0 @@
-image: /home/nguyenan/nvme_data/mbrobot_ws/src/mobile_robot/maps/map_a1.pgm
-mode: trinary
-resolution: 0.05
-origin: [-62.8594, -26.0669, 0]
-negate: 0
-occupied_thresh: 0.65
-free_thresh: 0.25
