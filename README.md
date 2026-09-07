@@ -112,7 +112,7 @@ The ESP32 and STM32 firmware are not part of this repository.
 | ROS dependencies | `sllidar_ros2`, `bno055`, `robot_localization`, `laser_filters`, `slam_toolbox`, `nav2_bringup` |
 | Python | `pyserial` |
 
-Two udev symlinks must resolve before launch: `/dev/ttyWheel` (STM32) and `/dev/ttyUltrasonic` (ESP32). The LiDAR expects the Jetson to hold a static address on its subnet; see [`docs/troubleshooting.md`](docs/troubleshooting.md).
+Two udev symlinks must resolve before launch: `/dev/ttyWheel` (STM32) and `/dev/ttyUltrasonic` (ESP32). The LiDAR expects the Jetson to hold a static address on its subnet; see [`assets/docs/troubleshooting.md`](assets/docs/troubleshooting.md).
 
 ## Quick start
 
@@ -179,8 +179,8 @@ ros2 run mobile_robot checkpoint_cmd.py                   # second terminal: sen
 
 | Document | Contents |
 |---|---|
-| [`docs/troubleshooting.md`](assets/docs/troubleshooting.md) | Per-subsystem bring-up checks: LiDAR link, ultrasonic bridge, IMU, wheel odometry, EKF |
-| [`docs/mapping.md`](assets/docs/mapping.md) | Saving a `slam_toolbox` map, including QoS and timeout settings for large maps |
+| [`assets/docs/troubleshooting.md`](assets/docs/troubleshooting.md) | Per-subsystem bring-up checks: LiDAR link, ultrasonic bridge, IMU, wheel odometry, EKF |
+| [`assets/docs/mapping.md`](assets/docs/mapping.md) | Saving a `slam_toolbox` map, including QoS and timeout settings for large maps |
 
 ## References
 
