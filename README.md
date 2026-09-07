@@ -179,8 +179,8 @@ ros2 run mobile_robot checkpoint_cmd.py                   # second terminal: sen
 
 | Document | Contents |
 |---|---|
-| [`docs/troubleshooting.md`](docs/troubleshooting.md) | Per-subsystem bring-up checks: LiDAR link, ultrasonic bridge, IMU, wheel odometry, EKF |
-| [`docs/mapping.md`](docs/mapping.md) | Saving a `slam_toolbox` map, including QoS and timeout settings for large maps |
+| [`docs/troubleshooting.md`](assets/docs/troubleshooting.md) | Per-subsystem bring-up checks: LiDAR link, ultrasonic bridge, IMU, wheel odometry, EKF |
+| [`docs/mapping.md`](assets/docs/mapping.md) | Saving a `slam_toolbox` map, including QoS and timeout settings for large maps |
 
 ## References
 
