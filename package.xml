@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>mobile_robot</name>
+  <version>1.0.0</version>
+  <description>
+    Mobile robot with RPLIDAR S2E and IMU BNO055.
+    Differential drive with SLAM Toolbox on Jetson AGX Xavier (ROS 2 Foxy).
+  </description>
+
+  <maintainer email="your_email@example.com">Your Name</maintainer>
+  <license>Apache-2.0</license>
+
+  <!-- ============================================================
+       BUILD TOOL
+  ============================================================ -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
+  <!-- ============================================================
+       PYTHON RUNTIME — imu_reader node
+  ============================================================ -->
+  <depend>rclpy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
+
+  <!-- ============================================================
+       TF / TRANSFORMS
+  ============================================================ -->
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+
+  <!-- ============================================================
+       ROBOT DESCRIPTION
+  ============================================================ -->
+  <depend>xacro</depend>
+  <depend>robot_state_publisher</depend>
+  <depend>joint_state_publisher</depend>
+  <depend>urdf</depend>
+
+  <!-- ============================================================
+       SENSOR DRIVERS
+  ============================================================ -->
+  <depend>sllidar_ros2</depend>   <!-- RPLIDAR S2E -->
+  <depend>bno055</depend>    <!-- IMU BNO055  -->
+
+  <!-- ============================================================
+       SENSOR FUSION — EKF
+  ============================================================ -->
+  <depend>robot_localization</depend>
+
+  <!-- ============================================================
+       LASER FILTER
+  ============================================================ -->
+  <depend>laser_filters</depend>
+
+  <!-- ============================================================
+       SLAM
+  ============================================================ -->
+  <depend>slam_toolbox</depend>
+
+  <!-- ============================================================
+       NAVIGATION (Nav2) — uncomment khi dùng navigation
+  ============================================================ -->
+   <depend>nav2_bringup</depend> 
+   <depend>nav2_msgs</depend>    
+   <depend>nav_msgs</depend>     
+
+  <!-- ============================================================
+       VISUALIZATION
+  ============================================================ -->
+  <depend>rviz2</depend>
+
+  <!-- ============================================================
+       LAUNCH
+  ============================================================ -->
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+
+  <!-- Thêm dependency cho pyserial -->
+  <exec_depend>python3-serial</exec_depend>
+
+  <!-- ============================================================
+       TEST
+  ============================================================ -->
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

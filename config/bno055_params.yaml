@@ -1,0 +1,18 @@
+bno055:
+  ros__parameters:
+    ros_topic_prefix: "imu/"
+    connection_type: "i2c"       # Dùng I2C
+    i2c_bus: 8                   # /dev/i2c-8 (I2C_GP5 trên J23)
+    i2c_addr: 0x28               # ADR=GND: 0x28 | ADR=VCC: 0x29
+    
+    # Operation mode: 
+    operation_mode: 0x08         # accelerometer + gyroscope (- magnetometer fusion)
+    # Frame IDs
+    frame_id: "imu_link"
+    
+    # Data rates
+    data_query_frequency: 50    # Hz
+    calib_status_frequency: 0.1  # Hz
+    
+    # Placement (robot phẳng, IMU nằm ngang)
+    placement_axis_remap: "P1"   # Xem bảng bên dưới
