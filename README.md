@@ -18,6 +18,9 @@
 
 Six HY-SRF05 transducers, mounted on three heights across the front face, cover the blind zone of the single-plane LiDAR and enter the Nav2 local costmap as a second observation source.
 
+> [!NOTE]
+> This package targets one physical platform and one environment class: a differential-drive chassis with a front caster, operating indoors on flat floors.
+
 <p align="center">
   <a href="https://www.youtube.com/shorts/xI_mEReax4k">
      <img src="https://i.ytimg.com/vi/xI_mEReax4k/hqdefault.jpg" alt="Watch Demo Video" width="600">
@@ -25,9 +28,6 @@ Six HY-SRF05 transducers, mounted on three heights across the front face, cover 
   <br>
   <em>Click to watch the Demo video</em>
 </p>
-
-> [!NOTE]
-> This package targets one physical platform and one environment class: a differential-drive chassis with a front caster, operating indoors on flat floors. There is no simulation model — every launch file assumes real hardware and `use_sim_time:=false`. ROS 2 Foxy is end-of-life, so upstream fixes are not backported into the installed binaries.
 
 ## System architecture
 
