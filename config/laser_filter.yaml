@@ -1,0 +1,50 @@
+scan_to_scan_filter_chain:
+  ros__parameters:
+    
+    # Bộ lọc 1: Box Filter - Loại bỏ các tia laser bắn trúng thân/bánh xe robot
+    filter1:
+      name: box_filter
+      type: laser_filters/LaserScanBoxFilter
+      params:
+        box_frame: base_footprint
+        invert: false
+        min_x: -0.15
+        max_x: 0.32
+        min_y: -0.30
+        max_y: 0.30
+        min_z: -0.05
+        max_z: 1.40
+
+    # Bộ lọc 2: Range Filter - Giới hạn tầm nhìn LiDAR
+    filter2:
+      name: range_filter
+      type: laser_filters/LaserScanRangeFilter
+      params:
+        use_message_range_limits: false    # Bỏ qua giới hạn gốc của phần cứng (RPLIDAR S2E là 30m)
+        lower_threshold: 0.06              # Giới hạn dưới: 6cm
+        upper_threshold: 15.0              # Giới hạn trên: 15 mét
+        
+        # RẤT QUAN TRỌNG: Xử lý các tia ngoài viền
+        lower_replacement_value: -.inf     # Các tia < 6cm sẽ bị gán thành -vô cùng (bỏ qua)
+        upper_replacement_value: .inf      # Các tia > 15m sẽ bị gán thành +vô cùng (Nav2 hiểu là không gian trống, không phải vật cản)
+    # Phần 2: XÓA 60° → 70°
+    filter3:
+      name: remove_60_to_70
+      type: laser_filters/LaserScanAngularBoundsFilterInPlace
+      params:
+        lower_angle:  1.57806   # 96.7°
+        upper_angle:  1.92495   # 107.9°
+        invert: false          # XÓA vùng nằm TRONG khoảng này
+
+# Phần 4: XÓA 290° → 300° (= -70° → -60°)
+    filter4:
+      name: remove_290_to_300
+      type: laser_filters/LaserScanAngularBoundsFilterInPlace
+      params:
+       lower_angle:   -1.90895 #  
+       upper_angle:  -1.58806 # 
+       invert: false          # XÓA vùng nằm TRONG khoảng này       
+    # Cấu hình đồng bộ TF
+    tf_message_filter_target_frame: base_footprint
+    tf_message_filter_queue_size: 20
+    tf_message_filter_tolerance: 0.15

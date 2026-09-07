@@ -1,0 +1,88 @@
+checkpoints:
+  - display_name: HOME
+    id: 0
+    name: cp01
+    orientation:
+      w: 0.025644
+      x: 0.0
+      y: 0.0
+      z: 0.999671
+    position:
+      x: 6.6810
+      y: -5.1279
+      z: 0.0
+  - display_name: Mr.Son'Room
+    id: 1
+    name: cp02
+    orientation:
+      w: 0.684484
+      x: 0.0
+      y: 0.0
+      z: 0.729027
+    position:
+      x: 1.8005
+      y: 19.5375
+      z: 0.0
+  - display_name: Elevator
+    id: 2
+    name: cp03
+    orientation:
+      w: 0.999061
+      x: 0.0
+      y: 0.0
+      z: -0.043336
+    position:
+      x: 0.3704
+      y: 0.1945
+      z: 0.0
+  - display_name: AISCLAB
+    id: 3
+    name: cp04
+    orientation:
+      w: 0.999991
+      x: 0.0
+      y: 0.0
+      z: 0.004350
+    position:
+      x: 2.7674
+      y: -4.8958
+      z: 0.0
+
+
+  - display_name: O-1
+    id: 4
+    name: cp04
+    orientation:
+      w: 0.025644
+      x: 0.0
+      y: 0.0
+      z: 0.999671
+    position:
+      x: 5.43320
+      y: -5.4908
+      z: 0.0
+  - display_name: O-2
+    id: 5
+    name: cp04
+    orientation:
+      w: 0.025644
+      x: 0.0
+      y: 0.0
+      z: 0.999671
+    position:
+      x: 3.74513
+      y: -4.5381
+      z: 0.0
+  - display_name: O-3
+    id: 5
+    name: cp04
+    orientation:
+      w: 0.025644
+      x: 0.0
+      y: 0.0
+      z: 0.999671
+    position:
+      x: 4.00159
+      y: -5.3085
+      z: 0.0
+frame_id: map
