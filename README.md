@@ -20,6 +20,14 @@ Six HY-SRF05 transducers, mounted on three heights across the front face, cover 
 
 [Watch the hardware demo — Nav2 navigation in the UIT CE faculty corridor](assets/gifs/Autonomous%20Mobile%20Robot%20%28v1%29%20%E2%80%94%20ROS%202%20Nav2%20Real%20Hardware%20Demo%20%20%20%20%20%20%20%20%20%20%28UIT%20CE%20Faculty%20Corridor%29.mp4)
 
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=52WKZ4SabQ0">
+     <img src="https://i.ytimg.com/vi/52WKZ4SabQ0/hqdefault.jpg" alt="Watch Demo Video" width="600">
+  </a>
+  <br>
+  <em>Click to watch the Demo video</em>
+</p>
+
 > [!NOTE]
 > This package targets one physical platform and one environment class: a differential-drive chassis with a front caster, operating indoors on flat floors. There is no simulation model — every launch file assumes real hardware and `use_sim_time:=false`. ROS 2 Foxy is end-of-life, so upstream fixes are not backported into the installed binaries.
 
