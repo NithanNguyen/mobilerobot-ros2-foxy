@@ -1,4 +1,4 @@
-# Mobile Robot
+# Receptionist Robot
 ## Details
 
 Jetson AGX Xavier Developer Kit 16GB (NVIDIA Xavier SoC) 
