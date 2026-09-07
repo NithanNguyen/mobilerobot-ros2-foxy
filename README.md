@@ -18,11 +18,9 @@
 
 Six HY-SRF05 transducers, mounted on three heights across the front face, cover the blind zone of the single-plane LiDAR and enter the Nav2 local costmap as a second observation source.
 
-[Watch the hardware demo — Nav2 navigation in the UIT CE faculty corridor](assets/gifs/Autonomous%20Mobile%20Robot%20%28v1%29%20%E2%80%94%20ROS%202%20Nav2%20Real%20Hardware%20Demo%20%20%20%20%20%20%20%20%20%20%28UIT%20CE%20Faculty%20Corridor%29.mp4)
-
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=52WKZ4SabQ0">
-     <img src="https://i.ytimg.com/vi/52WKZ4SabQ0/hqdefault.jpg" alt="Watch Demo Video" width="600">
+  <a href="https://www.youtube.com/shorts/xI_mEReax4k">
+     <img src="https://i.ytimg.com/vi/xI_mEReax4k/hqdefault.jpg" alt="Watch Demo Video" width="600">
   </a>
   <br>
   <em>Click to watch the Demo video</em>
