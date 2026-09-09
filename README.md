@@ -29,6 +29,17 @@ Six HY-SRF05 transducers, mounted on three heights across the front face, cover 
   <em>Click to watch the Demo video</em>
 </p>
 
+## 📌 What This Robot Does
+
+| Capability | Description |
+|---|---|
+| **2D SLAM Mapping** | Builds an occupancy-grid map of the environment from LiDAR scans. |
+| **Automatic Global Localization** | Localizes itself on a known map at startup without a manual initial pose. |
+| **Autonomous Checkpoint Navigation** | Plans and drives to named checkpoints defined in a configuration file. |
+| **Fused Obstacle Avoidance** | Avoids obstacles seen by either the LiDAR or the ultrasonic array. |
+| **Recovery Behaviors** | Recovers from failed plans by spinning, backing up, waiting, or clearing costmaps. |
+| **Pre-Operation Health Check** | Verifies hardware, configuration, and system health before deployment. |
+
 ## System architecture
 
 ![System architecture: sensors and MCU on the left, the ROS 2 Foxy stack on the Jetson in the centre, laptop RViz client over Wi-Fi](assets/images/system_architecture.png)
