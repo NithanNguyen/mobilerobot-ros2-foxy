@@ -192,8 +192,10 @@ ros2 run mobile_robot checkpoint_cmd.py                   # second terminal: sen
 - [Auvidea X221 manual](https://auvidea.eu/download/X221_Manual_v2.0.pdf) — carrier board pinout, including J23
 - [REP-105](https://www.ros.org/reps/rep-0105.html) — the `map` → `odom` → `base_footprint` frame convention used here
 
-## License and author
+## Acknowledgements
+
+The authors thank ASIC Lab - VNUHCM University of Information Technology for providing the equipment and hardware for the robot. This research was supported by the VNUHCM University of Information Technology’s Scientific Research Support Fund.
+
+## License
 
 Apache-2.0. See [`LICENSE`](LICENSE).
-
-Author: `<AUTHOR_NAME>`, `<AFFILIATION>`.
