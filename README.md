@@ -29,7 +29,7 @@ Six HY-SRF05 transducers, mounted on three heights across the front face, cover 
   <em>Click to watch the Demo video</em>
 </p>
 
-## 📌 What This Robot Does
+## 📌 Core Capabilities
 
 | Capability | Description |
 |---|---|
