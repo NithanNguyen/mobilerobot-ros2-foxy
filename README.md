@@ -35,7 +35,7 @@ Six HY-SRF05 transducers, mounted on three heights across the front face, cover 
 |---|---|
 | **2D SLAM Mapping** | Builds an occupancy-grid map of the environment from LiDAR scans. |
 | **Automatic Global Localization** | Localizes itself on a known map at startup without a manual initial pose. |
-| **Autonomous Checkpoint Navigation** | Plans and drives to named checkpoints defined in a configuration file. |
+| **Autonomous Checkpoint Navigation** | Plans and drives to the indentified checkpoints. |
 | **Fused Obstacle Avoidance** | Avoids obstacles seen by either the LiDAR or the ultrasonic array. |
 | **Recovery Behaviors** | Recovers from failed plans by spinning, backing up, waiting, or clearing costmaps. |
 | **Pre-Operation Health Check** | Verifies hardware, configuration, and system health before deployment. |
