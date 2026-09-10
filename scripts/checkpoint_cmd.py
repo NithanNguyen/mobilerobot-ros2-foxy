@@ -118,7 +118,7 @@ def load_checkpoints() -> str:
     """Load config/checkpoints_v2.yaml from installed mobile_robot package."""
     try:
         pkg = get_package_share_directory("mobile_robot")
-        path = os.path.join(pkg, "config", "checkpoints_e6_v1.yaml")
+        path = os.path.join(pkg, "config", "checkpoints_e6.yaml")
 
         with open(path, "r") as f:
             data = yaml.safe_load(f) or {}

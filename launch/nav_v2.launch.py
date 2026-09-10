@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# launch/nav_launch.py
+# launch/nav_v2_launch.py
 # ──────────────────────────────────────────────────────────────────────────────
 # Run on JETSON AGX Xavier — Full Hardware Bringup + EKF + Nav2
 #
@@ -8,25 +8,25 @@
 #   2. joint_state_publisher      — /joint_states                      [t = 1.5s]
 #   3. wheel_odom_node            — STM32 UART → /odom                 [t = 0.0s]
 #   4. bno055                     — I2C → /imu/data (~100 Hz)          [t = 0.0s]
-#   5. imu_reader                 — Quaternion → /imu/euler            [t = 3.0s]
-#   6. ekf_filter_node            — /odom + /imu/data → TF odom→base   [t = 7.0s]
-#   7. sllidar_node               — RPLIDAR S2E UDP → /scan            [t = 0.0s]
-#   8. scan_to_scan_filter_chain  — /scan → /scan_filtered             [t = 10.0s]
-#   9. nav2_bringup               — AMCL + Planner + Controller + BT   [t = 12.0s]
-#  10. checkpoint_navigator       — Autonomous waypoint sequencer      [t = 15.0s] (optional)
+#   5. jetson_sensor_bridge       — STM32/Arduino UART → /ultrasonic/* [t = 0.0s]
+#   6. imu_reader                 — Quaternion → /imu/euler            [t = 3.0s]
+#   7. ultrasonic_fusion_node     — /ultrasonic/* → /ultrasonic_scan   [t = 3.5s]
+#   8. ekf_filter_node            — /odom + /imu/data → TF odom→base   [t = 7.0s]
+#   9. sllidar_node               — RPLIDAR S2E UDP → /scan            [t = 0.0s]
+#  10. scan_to_scan_filter_chain  — /scan → /scan_filtered             [t = 10.0s]
+#  11. nav2_bringup               — AMCL + Planner + Controller + BT   [t = 12.0s]
+#  12. global_localizer           — Autonomous startup localization    [t = 14.0s]
+#  13. checkpoint_navigator       — Autonomous waypoint sequencer      [t = 20.0s]
 #
 # Environment (Jetson + Laptop must be the same):
 #   export ROS_DOMAIN_ID=42
 #   export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 #
-# Run local with default area (floor e6) :
-#   ros2 launch mobile_robot nav_launch.py
+# Run local with default area (floor e6):
+#   ros2 launch mobile_robot nav_v2_launch.py
 #
-# Run for a specific floor (e.g., e1) :
-#   ros2 launch mobile_robot nav_launch.py floor:=e1
-#
-# Run with Checkpoint Navigator:
-#   ros2 launch mobile_robot nav_launch.py autostart_navigator:=true
+# Run for a specific floor (e.g., e1):
+#   ros2 launch mobile_robot nav_v2_launch.py floor:=e1
 # ──────────────────────────────────────────────────────────────────────────────
 
 import os
@@ -57,8 +57,6 @@ def generate_launch_description():
     wheel_odom_config = os.path.join(pkg_share, 'config', 'wheel_odom_params.yaml')
     filter_config     = os.path.join(pkg_share, 'config', 'laser_filter.yaml')
     nav2_params       = os.path.join(pkg_share, 'config', 'nav2_params_test.yaml')
-    # default_map       = os.path.join(pkg_share, 'maps',   'lab_demo_map.yaml')
-    session_logger    = os.path.join(pkg_share, 'scripts', 'session_logger.py')
 
     # ── Launch arguments ───────────────────────────────────────────────────────
     declare_use_sim_time = DeclareLaunchArgument(
@@ -67,22 +65,10 @@ def generate_launch_description():
         description='Use simulation (Gazebo) clock if true. Must be false on physical hardware.'
     )
 
-    # declare_map = DeclareLaunchArgument(
-    #     'map',
-    #     default_value=default_map,
-    #     description='Full path to the occupancy grid map .yaml file.'
-    # )
-
     declare_floor = DeclareLaunchArgument(
         'floor',
-        default_value='e6',
+        default_value='a1',
         description='Floor identifier (e.g., e6, e1)'
-    )
-
-    declare_autostart_navigator = DeclareLaunchArgument(
-        'autostart_navigator',
-        default_value='true',
-        description='Automatically start the CheckpointNavigator node after Nav2 is ready.'
     )
 
     declare_timeout = DeclareLaunchArgument(
@@ -91,11 +77,23 @@ def generate_launch_description():
         description='Dwell time in seconds at each checkpoint before returning to home.'
     )
 
+    declare_us_serial_port = DeclareLaunchArgument(
+        'us_serial_port',
+        default_value='/dev/ttyUltrasonic',
+        description='Serial port for ultrasonic sensor bridge (STM32/Arduino).'
+    )
+
+    declare_us_baud_rate = DeclareLaunchArgument(
+        'us_baud_rate',
+        default_value='115200',
+        description='Baud rate for ultrasonic sensor serial port.'
+    )
+
     use_sim_time        = LaunchConfiguration('use_sim_time')
-    # map_file            = LaunchConfiguration('map')
-    floor = LaunchConfiguration('floor')
-    autostart_navigator = LaunchConfiguration('autostart_navigator')
+    floor               = LaunchConfiguration('floor')
     timeout             = LaunchConfiguration('timeout_at_checkpoint')
+    us_serial_port      = LaunchConfiguration('us_serial_port')
+    us_baud_rate        = LaunchConfiguration('us_baud_rate')
 
     dynamic_map_file = [
         pkg_share, '/maps/map_', floor, '.yaml'
@@ -104,25 +102,6 @@ def generate_launch_description():
     dynamic_checkpoint_file = [
         pkg_share, '/config/checkpoints_', floor, '.yaml'
     ]
-
-    # ══════════════════════════════════════════════════════════════════════════
-    # NODE 0 — Session Logger                                          [t = 0s]
-    # Write structured log to ~/robot_logs/session_YYYY-MM-DD_HH-MM-SS.log
-    # ══════════════════════════════════════════════════════════════════════════
-    session_logger_node = Node(
-        package='mobile_robot',
-        executable='session_logger.py',
-        name='session_logger',
-        output='screen',
-        parameters=[{
-            'use_sim_time': use_sim_time,
-            # 'log_dir': os.path.expanduser('~/robot_logs'),
-            'log_dir': os.path.join(
-                os.path.expanduser('~'),
-                'mbrobot_ws', 'src', 'mobile_robot', 'logs'
-            ),
-        }]
-    )
 
     # ══════════════════════════════════════════════════════════════════════════
     # NODE 1 — Robot State Publisher                                    [t = 0s]
@@ -187,7 +166,31 @@ def generate_launch_description():
     )
 
     # ══════════════════════════════════════════════════════════════════════════
-    # NODE 5 — IMU Reader (Quaternion → Euler)                        [t = 3.0s]
+    # NODE 5 — Jetson Sensor Bridge (Ultrasonic UART reader)           [t = 0s]
+    # ══════════════════════════════════════════════════════════════════════════
+    # Đọc frame "$v0,v1,...,v7*chk" từ STM32/Arduino qua UART
+    # và publish từng sensor thành /ultrasonic/<name> (sensor_msgs/Range).
+    # Topic map: index 0..7 → us_top_left, us_top_right, us_mid_1_left,
+    #                          us_mid_1_right, us_mid_2_left, us_mid_2_right,
+    #                          us_bot_left, us_bot_right
+    #
+    # respawn=True: tự restart nếu mất kết nối USB
+    jetson_sensor_bridge_node = Node(
+        package='mobile_robot',
+        executable='jetson_sensor_bridge.py',
+        name='jetson_sensor_bridge',
+        output='screen',
+        respawn=True,
+        respawn_delay=3.0,
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'serial_port':  us_serial_port,
+            'baud_rate':    us_baud_rate,
+        }]
+    )
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # NODE 6 — IMU Reader (Quaternion → Euler)                        [t = 3.0s]
     # ══════════════════════════════════════════════════════════════════════════
     imu_reader_node = Node(
         package='mobile_robot',
@@ -206,10 +209,27 @@ def generate_launch_description():
     )
 
     # ══════════════════════════════════════════════════════════════════════════
-    # NODE 6 — EKF (robot_localization)                               [t = 7.0s]
+    # NODE 7 — Ultrasonic Fusion Node                                 [t = 3.5s]
     # ══════════════════════════════════════════════════════════════════════════
-    # Fuses /odom + /imu/data → publishes TF odom → base_footprint
-    # AMCL will publish TF map → odom (do NOT add a static_tf here)
+    ultrasonic_fusion_node = Node(
+        package='mobile_robot',
+        executable='ultrasonic_fusion_node.py',
+        name='ultrasonic_fusion_node',
+        output='screen',
+        parameters=[{'use_sim_time': use_sim_time}]
+    )
+
+    delayed_ultrasonic_fusion = TimerAction(
+        period=3.5,
+        actions=[
+            LogInfo(msg='[nav] [3.5s] Starting ultrasonic_fusion_node...'),
+            ultrasonic_fusion_node,
+        ]
+    )
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # NODE 8 — EKF (robot_localization)                               [t = 7.0s]
+    # ══════════════════════════════════════════════════════════════════════════
     ekf_node = Node(
         package='robot_localization',
         executable='ekf_node',
@@ -227,15 +247,15 @@ def generate_launch_description():
     )
 
     # ══════════════════════════════════════════════════════════════════════════
-    # NODE 7 — RPLIDAR S2E Driver (UDP)                                [t = 0s]
+    # NODE 9 — RPLIDAR S2E Driver (UDP)                                [t = 0s]
     # ══════════════════════════════════════════════════════════════════════════
     lidar_node = Node(
         package='sllidar_ros2',
         executable='sllidar_node',
         name='sllidar_node',
         output='screen',
-        respawn=True,               # ← tự restart khi chết
-        respawn_delay=3.0,          # ← chờ 3s trước khi restart
+        respawn=True,
+        respawn_delay=3.0,
         parameters=[{
             'channel_type':     'udp',
             'udp_ip':           '192.168.11.2',
@@ -249,7 +269,7 @@ def generate_launch_description():
     )
 
     # ══════════════════════════════════════════════════════════════════════════
-    # NODE 8 — Laser Scan Filter                                      [t = 10s]
+    # NODE 10 — Laser Scan Filter                                     [t = 10s]
     # ══════════════════════════════════════════════════════════════════════════
     scan_filter_node = Node(
         package='laser_filters',
@@ -268,20 +288,8 @@ def generate_launch_description():
     )
 
     # ══════════════════════════════════════════════════════════════════════════
-    # NODE 9 — Nav2 Bringup                                           [t = 12s]
+    # NODE 11 — Nav2 Bringup                                          [t = 12s]
     # ══════════════════════════════════════════════════════════════════════════
-    # Delay 12s = 10s (scan filter ready) + 2s buffer for /scan_filtered to stabilize.
-    #
-    # Launches the full Nav2 navigation stack:
-    #   - map_server       : serves the pre-built occupancy grid map
-    #   - amcl             : Monte Carlo localization on the known map
-    #                        broadcasts TF map → odom
-    #   - planner_server   : global path planning (NavFn / A*)
-    #   - controller_server: local trajectory following (DWB)
-    #   - bt_navigator     : behavior tree executive
-    #   - recoveries_server: spin, back-up, wait recovery behaviors
-    #
-    # Config: nav2_params.yaml
     nav2_bringup = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_nav2_bringup, 'launch', 'bringup_launch.py')
@@ -302,17 +310,52 @@ def generate_launch_description():
     )
 
     # ══════════════════════════════════════════════════════════════════════════
-    # SET INITIAL POSE                                                [t = 15s]
+    # NODE 12 — Global Localizer                                       [t = 14s]
+    # ══════════════════════════════════════════════════════════════════════════
+    # Autonomous startup localization — replaces the old hardcoded set_initial_pose
+    # ExecuteProcess. Waits for AMCL, calls /reinitialize_global_localization,
+    # spins 360° to gather LiDAR observations, then confirms the converged pose
+    # and publishes /global_localizer/ready.
+    # Threshold values can be tuned from nav2_params_test.yaml without recompiling.
+    global_localizer_node = Node(
+        package='mobile_robot',
+        executable='global_localizer.py',
+        name='global_localizer',
+        output='screen',
+        parameters=[{
+            'use_sim_time':              use_sim_time,
+            'convergence_threshold_xy':  0.10,
+            'convergence_threshold_yaw': 0.15,
+            'spin_angular_velocity':     0.4,
+            'max_spin_attempts':         3,
+            'amcl_wait_timeout':         30.0,
+        }]
+    )
+
+    delayed_global_localizer = TimerAction(
+        period=14.0,
+        actions=[
+            LogInfo(msg='[nav] [14.0s] Starting global_localizer (autonomous localization)...'),
+            global_localizer_node,
+        ]
+    )
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # NODE 12 - SET INITIAL POSE                                       [t = 15s]
     # ══════════════════════════════════════════════════════════════════════════
     set_initial_pose = ExecuteProcess(
         cmd=[
             'ros2', 'topic', 'pub', '--once',
             '/initialpose',
             'geometry_msgs/msg/PoseWithCovarianceStamped',
-            '{ "header": { "frame_id": "map" }, "pose": { "pose": { "position": { "x": -4.060969452922816, "y": -7.062074023321159, "z": 0.0 }, "orientation": { "x": 0.0, "y": 0.0, "z": -0.16922996701569956, "w": 0.9855765917795862 } }, "covariance": [0.25, 0, 0, 0, 0, 0, 0, 0.25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.068] } }'
+            '{"header": {"frame_id": "map"}, "pose": {"pose": {"position": {"x": -4.047, "y": -7.508, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -0.1701, "w": 0.9854}}, "covariance": [0.25,0,0,0,0,0,0,0.25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.068]}}'
+            # '{"header": {"frame_id": "map"}, "pose": {"pose": {"position": {"x": -0.285, "y": -0.159, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.9818, "w": 0.1899}}, "covariance": [0.25,0,0,0,0,0,0,0.25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.068]}}'
+            # a1 thu vien
+            # '{"header": {"frame_id": "map"}, "pose": {"pose": {"position": {"x": -45.612, "y": 7.584, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -0.918, "w": 0.396}}, "covariance": [0.25,0,0,0,0,0,0,0.25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.068]}}'
         ],
         output='screen'
     )
+# Setting estimate pose: Frame:map, Position(-45.6767, 7.93121, 0), Orientation(0, 0, -0.911428, 0.411461) = Angle: -2.29348
 
     delayed_initial_pose = TimerAction(
         period=15.0,
@@ -323,22 +366,13 @@ def generate_launch_description():
     )
 
     # ══════════════════════════════════════════════════════════════════════════
-    # NODE 10 — Checkpoint Navigator  (optional)                      [t = 15s]
+    # NODE 13 — Checkpoint Navigator                                   [t = 20s]
     # ══════════════════════════════════════════════════════════════════════════
-    # Only launched when autostart_navigator:=true.
-    #
-    # Control topics:
-    #   /robot/navigate_to_checkpoint  (std_msgs/Int32  — input)
-    #   /robot/emergency_stop          (std_msgs/Bool   — input)
-    #   /robot/state                   (std_msgs/String — output)
-    #   /robot/current_checkpoint      (std_msgs/Int32  — output)
-    #   /robot/status_message          (std_msgs/String — output)
     checkpoint_navigator_node = Node(
         package='mobile_robot',
         executable='navigator.py',
         name='navigator',
         output='screen',
-        condition=IfCondition(autostart_navigator),
         parameters=[{
             'use_sim_time':          use_sim_time,
             'checkpoint_file':       dynamic_checkpoint_file,
@@ -350,7 +384,7 @@ def generate_launch_description():
     delayed_checkpoint_nav = TimerAction(
         period=20.0,
         actions=[
-            LogInfo(msg='[nav] Starting checkpoint_navigator...'),
+            LogInfo(msg='[nav] [20.0s] Starting checkpoint_navigator...'),
             checkpoint_navigator_node,
         ]
     )
@@ -360,24 +394,26 @@ def generate_launch_description():
     # ══════════════════════════════════════════════════════════════════════════
     return LaunchDescription([
         declare_use_sim_time,
-        # declare_map,
         declare_floor,
-        declare_autostart_navigator,
         declare_timeout,
+        declare_us_serial_port,
+        declare_us_baud_rate,
 
         LogInfo(msg='[nav] ═══ Starting Full Hardware Bringup + EKF + Nav2 ═══'),
-        LogInfo(msg='[nav] [0.0s] Starting RSP, wheel_odom, bno055, lidar...'),
-        # session_logger_node,
+        LogInfo(msg='[nav] [0.0s] Starting RSP, wheel_odom, bno055, lidar, sensor_bridge...'),
+
         robot_state_publisher,
         wheel_odom_node,
         bno055_node,
         lidar_node,
-
+        jetson_sensor_bridge_node,
+        delayed_ultrasonic_fusion,
         delayed_jsp,
         delayed_imu_reader,
         delayed_ekf,
         delayed_scan_filter,
         delayed_nav2,
+        # delayed_global_localizer,
         delayed_initial_pose,
         delayed_checkpoint_nav,
     ])

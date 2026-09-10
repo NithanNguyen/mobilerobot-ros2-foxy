@@ -71,6 +71,10 @@ install(DIRECTORY meshes/
   DESTINATION share/${PROJECT_NAME}/meshes
 )
 
+install(DIRECTORY mobile_robot/
+  DESTINATION share/${PROJECT_NAME}/mobile_robot
+)
+
 install(DIRECTORY scripts/
   DESTINATION share/${PROJECT_NAME}/scripts
 )

@@ -5,8 +5,12 @@ amcl:
     # ── Autonomous global localization (global_localizer node) ──────────────
     # No hardcoded initial pose: global_localizer calls
     # /reinitialize_global_localization at startup and spins to converge.
-    set_initial_pose: False
-    # (initial_pose_* intentionally removed — pose is found autonomously.)
+    set_initial_pose: True
+    # ----- HOME -----
+    initial_pose_x: 5.4779
+    initial_pose_y: -4.8841
+    initial_pose_z: 0.0
+    initial_pose_yaw: 3.0902990235285723
 
     # Nhiễu mô hình chuyển động odometry (dẫn động vi sai).
     # α1: quay→quay  | α2: tịnh tiến→quay | α3: tịnh tiến→tịnh tiến | α4: quay→tịnh tiến | α5: tịnh tiến→tịnh tiến (trượt ngang)
@@ -123,7 +127,7 @@ bt_navigator_rclcpp_node:
 controller_server:
   ros__parameters:
     use_sim_time: False
-    controller_frequency: 15.0       # [Hz] tần suất xuất cmd_vel
+    controller_frequency: 10.0       # [Hz] tần suất xuất cmd_vel
 
     # Ngưỡng vận tốc dưới mức robot được coi là đứng yên.
     min_x_velocity_threshold: 0.001  # [m/s]

@@ -7,7 +7,7 @@ set -eo pipefail
 # ROS 2 Foxy | mobile_robot package
 # ==================================================
 # Purpose:
-#   Launch slam_launch.py, record a bag, and auto-save the map
+#   Launch slam_v3_launch.py, record a bag, and auto-save the map
 #   (pgm + yaml) when the operator presses Ctrl+C.
 #   Map is saved BEFORE slam_toolbox is killed.
 #
@@ -47,7 +47,7 @@ set -eo pipefail
 # ==================================================
 WS="${WS:-$HOME/mbrobot_ws}"
 PKG="${PKG:-mobile_robot}"
-LAUNCH_FILE="${LAUNCH_FILE:-slam.launch.py}"
+LAUNCH_FILE="${LAUNCH_FILE:-slam_v3_launch.py}"
 
 # Experiment identity
 SCENARIO="${SCENARIO:-S6}"

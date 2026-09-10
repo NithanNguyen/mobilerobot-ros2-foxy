@@ -44,7 +44,7 @@ set -eo pipefail
 # ==================================================
 WS="${WS:-$HOME/mbrobot_ws}"
 PKG="${PKG:-mobile_robot}"
-LAUNCH_FILE="${LAUNCH_FILE:-nav.launch.py}"
+LAUNCH_FILE="${LAUNCH_FILE:-nav_v3.launch.py}"
 
 # Experiment identity
 SCENARIO="${SCENARIO:-S1}"
@@ -52,7 +52,7 @@ RUN_NUMBER="${RUN_NUMBER:-01}"
 RECORD_BAG="${RECORD_BAG:-true}"
 
 # Nav parameters (inherited)
-FLOOR="${FLOOR:-a1}"
+FLOOR="${FLOOR:-e6_v1}"
 USE_SIM_TIME="${USE_SIM_TIME:-false}"
 TIMEOUT_AT_CHECKPOINT="${TIMEOUT_AT_CHECKPOINT:-30.0}"
 US_SERIAL_PORT="${US_SERIAL_PORT:-/dev/ttyUltrasonic}"
