@@ -14,12 +14,9 @@
 
 ## Overview
 
-`mobile_robot` is the complete ROS 2 package for a hoverboard-chassis service robot that drives itself between named checkpoints inside a building. An operator sends `go:3` on a single topic; the robot plans, aligns its heading, drives, and returns home on a timeout. Localization, planning, control and sensor fusion all run on the robot's Jetson — the laptop is used only for RViz and SSH.
+Differential-drive robot navigating autonomously between named checkpoints in a university building; all localization, planning and sensor fusion run on-board.
 
 Six HY-SRF05 transducers, mounted on three heights across the front face, cover the blind zone of the single-plane LiDAR and enter the Nav2 local costmap as a second observation source.
-
-> [!NOTE]
-> This package targets one physical platform and one environment class: a differential-drive chassis with a front caster, operating indoors on flat floors.
 
 <p align="center">
   <a href="https://www.youtube.com/shorts/k9PKvo4-gvw">
