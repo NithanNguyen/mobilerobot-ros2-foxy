@@ -22,8 +22,8 @@ Six HY-SRF05 transducers, mounted on three heights across the front face, cover 
 > This package targets one physical platform and one environment class: a differential-drive chassis with a front caster, operating indoors on flat floors.
 
 <p align="center">
-  <a href="https://www.youtube.com/shorts/xI_mEReax4k">
-     <img src="https://i.ytimg.com/vi/xI_mEReax4k/hqdefault.jpg" alt="Watch Demo Video" width="600">
+  <a href="https://www.youtube.com/shorts/k9PKvo4-gvw">
+     <img src="https://i.ytimg.com/vi/k9PKvo4-gvw/hqdefault.jpg" alt="Watch Demo Video" width="600">
   </a>
   <br>
   <em>Click to watch the Demo video</em>
